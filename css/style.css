@@ -1,6 +1,6 @@
-/* ============================================================ */
-/* RESET & BASE STYLES */
-/* ============================================================ */
+/* ============================================================
+   RESET & BASE STYLES
+   ============================================================ */
 
 *,
 *::before,
@@ -14,14 +14,14 @@ body {
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #1a1a1a;
+  background-color: #0f0f0f;
+  color: #e8e8e8;
   height: 100vh;
   overflow: hidden;
 }
 
 a {
-  color: #4a90d9;
+  color: #7c8dff;
   text-decoration: none;
   cursor: pointer;
 }
@@ -30,11 +30,9 @@ a:hover {
   text-decoration: underline;
 }
 
-/* ============================================================ */
-/* SCREEN MANAGEMENT */
-/* ============================================================ */
-
-/* all screens are hidden by default and only screens with active class are visible */
+/* ============================================================
+   SCREEN MANAGEMENT
+   ============================================================ */
 
 .screen {
   display: none;
@@ -48,41 +46,49 @@ a:hover {
   justify-content: center;
 }
 
-/* ============================================================ */
-/* UTILITY CLASSES */
-/* ============================================================ */
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
 
 .hidden {
   display: none !important;
 }
 
-/* ============================================================ */
-/* BUTTONS */
-/* ============================================================ */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
 .btn {
   padding: 12px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+.btn-logout {
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .btn-primary {
-  background-color: #4a90d9;
+  background-color: #7c8dff;
   color: #ffffff;
   width: 100%;
 }
 
 .btn-primary:hover {
-  background-color: #357abd;
+  background-color: #6b7de0;
+  transform: translateY(-1px);
 }
 
 .btn-primary:disabled {
-  background-color: #b0d0f0;
+  background-color: #3a3f5c;
+  color: #7a7f9a;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-icon {
@@ -93,20 +99,22 @@ a:hover {
   padding: 4px 8px;
   border-radius: 6px;
   transition: background-color 0.2s;
+  color: #a0a0a0;
 }
 
 .btn-icon:hover {
-  background-color: #f5f5f5;
+  background-color: #2a2a2a;
 }
 
-/* ============================================================ */
-/* AUTH SCREEN */
-/* ============================================================ */
+/* ============================================================
+   AUTH SCREEN
+   ============================================================ */
 
 .auth-container {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  background: #1a1a1a;
+  border-radius: 16px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   padding: 40px;
   width: 100%;
   max-width: 420px;
@@ -125,13 +133,13 @@ a:hover {
 .auth-header h1 {
   font-size: 28px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #ffffff;
   margin-bottom: 4px;
 }
 
 .auth-subtitle {
   font-size: 14px;
-  color: #888888;
+  color: #8a8a8a;
 }
 
 .auth-form h2 {
@@ -139,6 +147,7 @@ a:hover {
   font-weight: 600;
   margin-bottom: 20px;
   text-align: center;
+  color: #e0e0e0;
 }
 
 .input-group {
@@ -149,34 +158,40 @@ a:hover {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #555555;
+  color: #a0a0a0;
   margin-bottom: 6px;
 }
 
 .input-group input {
   width: 100%;
   padding: 12px 14px;
-  border: 1.5px solid #e0e0e0;
+  background: #242424;
+  border: 1.5px solid #333333;
   border-radius: 8px;
   font-size: 15px;
+  color: #e8e8e8;
   transition: border-color 0.2s ease;
   outline: none;
 }
 
+.input-group input::placeholder {
+  color: #666666;
+}
+
 .input-group input:focus {
-  border-color: #4a90d9;
+  border-color: #7c8dff;
 }
 
 .auth-switch {
   text-align: center;
   margin-top: 20px;
   font-size: 14px;
-  color: #888888;
+  color: #8a8a8a;
 }
 
-/* ============================================================ */
-/* CHAT SCREEN */
-/* ============================================================ */
+/* ============================================================
+   CHAT SCREEN
+   ============================================================ */
 
 .chat-container {
   display: flex;
@@ -184,15 +199,15 @@ a:hover {
   width: 100%;
 }
 
-/* ============================================================ */
-/* SIDEBAR */
-/* ============================================================ */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 
 .sidebar {
   width: 340px;
   min-width: 340px;
-  background: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  background: #1a1a1a;
+  border-right: 1px solid #2a2a2a;
   display: flex;
   flex-direction: column;
 }
@@ -202,7 +217,8 @@ a:hover {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #2a2a2a;
+  background: #1e1e1e;
 }
 
 .current-user {
@@ -214,7 +230,7 @@ a:hover {
 .user-avatar {
   width: 36px;
   height: 36px;
-  background: #4a90d9;
+  background: linear-gradient(135deg, #7c8dff, #a78bfa);
   color: #ffffff;
   border-radius: 50%;
   display: flex;
@@ -227,26 +243,33 @@ a:hover {
 .user-name {
   font-weight: 600;
   font-size: 15px;
+  color: #e8e8e8;
 }
 
 .search-container {
   padding: 12px 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #2a2a2a;
   position: relative;
 }
 
 .search-container input {
   width: 100%;
   padding: 10px 14px;
-  border: 1.5px solid #e0e0e0;
+  background: #242424;
+  border: 1.5px solid #333333;
   border-radius: 20px;
   font-size: 14px;
+  color: #e8e8e8;
   outline: none;
   transition: border-color 0.2s;
 }
 
+.search-container input::placeholder {
+  color: #666666;
+}
+
 .search-container input:focus {
-  border-color: #4a90d9;
+  border-color: #7c8dff;
 }
 
 .search-results {
@@ -254,10 +277,10 @@ a:hover {
   top: 100%;
   left: 16px;
   right: 16px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background: #242424;
+  border: 1px solid #333333;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   z-index: 10;
   max-height: 300px;
   overflow-y: auto;
@@ -270,10 +293,11 @@ a:hover {
   align-items: center;
   gap: 10px;
   transition: background-color 0.2s;
+  color: #e8e8e8;
 }
 
 .search-result-item:hover {
-  background-color: #f5f5f5;
+  background-color: #2e2e2e;
 }
 
 .conversations-list {
@@ -288,22 +312,23 @@ a:hover {
   align-items: center;
   gap: 12px;
   transition: background-color 0.2s;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #222222;
 }
 
 .conversation-item:hover {
-  background-color: #f0f7ff;
+  background-color: #242424;
 }
 
 .conversation-item.active {
-  background-color: #e3f2fd;
+  background-color: #2a2d3e;
+  border-left: 3px solid #7c8dff;
 }
 
 .conversation-avatar {
   width: 44px;
   height: 44px;
-  background: #e3f2fd;
-  color: #4a90d9;
+  background: linear-gradient(135deg, #3a3f5c, #4a4f6c);
+  color: #b0b8ff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -321,28 +346,29 @@ a:hover {
 .conversation-name {
   font-weight: 600;
   font-size: 15px;
+  color: #e0e0e0;
 }
 
 .conversation-username {
   font-size: 13px;
-  color: #888888;
+  color: #7a7a7a;
 }
 
-/* ============================================================ */
-/* MAIN CHAT AREA */
-/* ============================================================ */
+/* ============================================================
+   MAIN CHAT AREA
+   ============================================================ */
 
 .chat-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: #0f0f0f;
 }
 
 .chat-header {
   padding: 16px 20px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
   display: flex;
   align-items: center;
 }
@@ -356,11 +382,12 @@ a:hover {
 .chat-header-name {
   font-weight: 600;
   font-size: 16px;
+  color: #e8e8e8;
 }
 
 .encryption-badge {
   font-size: 12px;
-  color: #888888;
+  color: #6eccaf;
 }
 
 .messages-container {
@@ -375,29 +402,31 @@ a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #888888;
+  color: #6a6a6a;
   text-align: center;
 }
 
 .no-chat-icon {
   font-size: 64px;
   margin-bottom: 16px;
+  opacity: 0.5;
 }
 
 .no-chat-selected h3 {
   font-size: 20px;
-  color: #555555;
+  color: #a0a0a0;
   margin-bottom: 8px;
 }
 
 .no-chat-selected p {
   font-size: 14px;
+  color: #6a6a6a;
 }
 
 .message-input-container {
   padding: 16px 20px;
-  background: #ffffff;
-  border-top: 1px solid #e0e0e0;
+  background: #1a1a1a;
+  border-top: 1px solid #2a2a2a;
 }
 
 .message-input-container form {
@@ -408,25 +437,32 @@ a:hover {
 .message-input-container input {
   flex: 1;
   padding: 12px 16px;
-  border: 1.5px solid #e0e0e0;
+  background: #242424;
+  border: 1.5px solid #333333;
   border-radius: 20px;
   font-size: 14px;
+  color: #e8e8e8;
   outline: none;
   transition: border-color 0.2s;
 }
 
+.message-input-container input::placeholder {
+  color: #666666;
+}
+
 .message-input-container input:focus {
-  border-color: #4a90d9;
+  border-color: #7c8dff;
 }
 
 .message-input-container .btn {
   width: auto;
   border-radius: 20px;
+  padding: 10px 24px;
 }
 
-/* ============================================================ */
-/* MESSAGE BUBBLES */
-/* ============================================================ */
+/* ============================================================
+   MESSAGE BUBBLES
+   ============================================================ */
 
 .message {
   display: flex;
@@ -451,25 +487,25 @@ a:hover {
 }
 
 .message.sent .message-bubble {
-  background-color: #e3f2fd;
-  color: #1a1a1a;
+  background: linear-gradient(135deg, #5b6fe0, #7c8dff);
+  color: #ffffff;
   border-bottom-right-radius: 4px;
 }
 
 .message.received .message-bubble {
-  background-color: #ffffff;
-  color: #1a1a1a;
-  border: 1px solid #e8e8e8;
+  background-color: #242424;
+  color: #e0e0e0;
+  border: 1px solid #2e2e2e;
   border-bottom-left-radius: 4px;
 }
 
-/* ============================================================ */
-/* FORM VALIDATION — Error Messages */
-/* ============================================================ */
+/* ============================================================
+   FORM VALIDATION — Error Messages
+   ============================================================ */
 
 .error-message {
   display: block;
-  color: #e74c3c;
+  color: #ff6b6b;
   font-size: 12px;
   margin-top: 4px;
   min-height: 0;
@@ -477,18 +513,36 @@ a:hover {
 }
 
 input.error {
-  border-color: #e74c3c !important;
-  background-color: #fff8f8;
+  border-color: #ff6b6b !important;
+  background-color: #2a1f1f !important;
 }
 
 input.error:focus {
-  border-color: #e74c3c !important;
-  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.15);
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
 }
 
-/* ============================================================ */
-/* RESPONSIVE DESIGN */
-/* ============================================================ */
+/* Unread message badge */
+.unread-badge {
+  color: #7c8dff;
+  font-size: 18px;
+  flex-shrink: 0;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
 
 @media (max-width: 768px) {
   .auth-container {
