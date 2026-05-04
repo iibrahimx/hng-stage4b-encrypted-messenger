@@ -241,12 +241,37 @@ async function importPublicKey(base64Key) {
 
 /**
  * Function 6: encryptAESKeyWithRSA
+ *
  * Locks the one-time AES key inside an RSA lockbox using someone's public key.
+ *
+ * How it works:
+ *   1. Export the AES key to raw bytes (we can only encrypt bytes, not key objects)
+ *   2. Encrypt those raw bytes with the recipient's RSA public key
+ *
+ * This is used twice per message:
+ *   1. With recipient's public key → encryptedKey
+ *   2. With your own public key → encryptedKeyForSelf
+ *
+ * @param {CryptoKey} aesKey - The one-time AES key to protect
+ * @param {string} publicKeyBase64 - The recipient's RSA public key (as a base64 string)
+ * @returns {Promise<ArrayBuffer>} - The encrypted AES key bytes (the locked lockbox)
  */
 async function encryptAESKeyWithRSA(aesKey, publicKeyBase64) {
+  // Import the recipient's public key from base64
   const publicKey = await importPublicKey(publicKeyBase64);
 
-  return crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, aesKey);
+  // Export the AES key to raw bytes
+  // crypto.subtle.encrypt() needs raw bytes, not a CryptoKey object
+  const aesKeyRaw = await crypto.subtle.exportKey("raw", aesKey);
+
+  // Encrypt the raw AES key bytes with RSA-OAEP
+  return crypto.subtle.encrypt(
+    {
+      name: "RSA-OAEP",
+    },
+    publicKey,
+    aesKeyRaw, // this is an ArrayBuffer, which is what encrypt() expects
+  );
 }
 
 // ============================================================
