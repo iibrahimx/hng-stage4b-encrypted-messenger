@@ -297,6 +297,20 @@ registerForm.addEventListener("submit", async function (event) {
       "Username must be at least 3 characters.",
     );
     hasError = true;
+  } else if (username.length > 32) {
+    showInputError(
+      registerUsernameInput,
+      registerUsernameError,
+      "Username must be 32 characters or fewer.",
+    );
+    hasError = true;
+  } else if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+    showInputError(
+      registerUsernameInput,
+      registerUsernameError,
+      "Username can only contain letters, numbers, underscores, and hyphens.",
+    );
+    hasError = true;
   }
 
   if (!displayName) {
@@ -319,7 +333,7 @@ registerForm.addEventListener("submit", async function (event) {
     showInputError(
       registerPasswordInput,
       registerPasswordError,
-      "Password must be 8 characters or more.",
+      "Password must be at least 8 characters.",
     );
     hasError = true;
   } else if (password.length > 128) {

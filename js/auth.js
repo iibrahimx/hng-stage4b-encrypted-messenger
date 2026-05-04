@@ -80,7 +80,26 @@ async function registerUser(username, displayName, password) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.detail || "Registration failed");
+
+    // The server might return 'detail' as a string or an object
+    // We need to handle both cases
+    let errorMessage = "Registration failed";
+
+    if (errorData.detail) {
+      if (typeof errorData.detail === "string") {
+        errorMessage = errorData.detail;
+      } else if (Array.isArray(errorData.detail)) {
+        // Some APIs return an array of error objects
+        errorMessage = errorData.detail
+          .map((e) => e.msg || JSON.stringify(e))
+          .join(", ");
+      } else if (typeof errorData.detail === "object") {
+        // The detail might be an object with field-level errors
+        errorMessage = JSON.stringify(errorData.detail);
+      }
+    }
+
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
@@ -121,7 +140,22 @@ async function loginUser(username, password) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.detail || "Login failed");
+
+    let errorMessage = "Login failed";
+
+    if (errorData.detail) {
+      if (typeof errorData.detail === "string") {
+        errorMessage = errorData.detail;
+      } else if (Array.isArray(errorData.detail)) {
+        errorMessage = errorData.detail
+          .map((e) => e.msg || JSON.stringify(e))
+          .join(", ");
+      } else if (typeof errorData.detail === "object") {
+        errorMessage = JSON.stringify(errorData.detail);
+      }
+    }
+
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();

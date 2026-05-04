@@ -83,26 +83,95 @@ async function deriveWrappingKey(password, salt) {
 
 /**
  * Function 2: wrapPrivateKey
- * Locks a private key inside a safe using the wrapping key.
+ *
+ * Protects the RSA private key for storage on the server.
+ *
+ * How it works (step by step):
+ *   1. Export the private key to pkcs8 format (standard binary format)
+ *   2. Generate a random IV (starting position) for AES-GCM
+ *   3. Encrypt the pkcs8 bytes with AES-GCM using the wrapping key
+ *   4. Combine the IV and encrypted bytes into a single package
+ *   5. Return the combined package
+ *
+ * Why AES-GCM instead of AES-KW:
+ *   AES-KW has strict alignment requirements that can fail with RSA keys
+ *   in some browsers. AES-GCM has no such restriction and is equally secure.
+ *
+ * @param {CryptoKey} privateKey - The RSA private key to protect
+ * @param {CryptoKey} wrappingKey - The key derived from the user's password
+ * @returns {Promise<ArrayBuffer>} - The encrypted private key (IV prepended)
  */
 async function wrapPrivateKey(privateKey, wrappingKey) {
-  return crypto.subtle.wrapKey("pkcs8", privateKey, wrappingKey, "AES-KW");
+  // Export the private key to raw pkcs8 bytes
+  // This gives an ArrayBuffer we can encrypt directly
+  const pkcs8Bytes = await crypto.subtle.exportKey("pkcs8", privateKey);
+
+  // Generate a random IV for AES-GCM
+  // 12 bytes is the standard for AES-GCM
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+
+  // Step 3: Encrypt the pkcs8 bytes with AES-GCM
+  const encryptedBytes = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    wrappingKey,
+    pkcs8Bytes,
+  );
+
+  // Combine IV + encrypted data into one package
+  // The IV must be sent along with the encrypted data for decryption
+  const combined = new Uint8Array(iv.length + encryptedBytes.byteLength);
+  combined.set(iv, 0); // Put IV at the beginning
+  combined.set(new Uint8Array(encryptedBytes), iv.length); // Then the encrypted data
+
+  return combined.buffer;
 }
 
 /**
  * Function 3: unwrapPrivateKey
- * Opens the safe and retrieves the private key.
+ *
+ * Recovers the RSA private key from its encrypted form.
+ * This is the reverse of wrapPrivateKey.
+ *
+ * How it works (step by step):
+ *   1. Extract the IV from the beginning of the combined package
+ *   2. Extract the encrypted data from the rest
+ *   3. Decrypt with AES-GCM using the wrapping key
+ *   4. Import the decrypted pkcs8 bytes back into a CryptoKey object
+ *
+ * @param {ArrayBuffer} wrappedData - The combined IV + encrypted private key
+ * @param {CryptoKey} wrappingKey - The key re-derived from the user's password
+ * @returns {Promise<CryptoKey>} - The unlocked RSA private key
  */
-async function unwrapPrivateKey(wrappedKey, wrappingKey) {
-  return crypto.subtle.unwrapKey(
-    "pkcs8",
-    wrappedKey,
+async function unwrapPrivateKey(wrappedData, wrappingKey) {
+  // Split the combined package into IV and encrypted data
+  const combined = new Uint8Array(wrappedData);
+
+  // The first 12 bytes are the IV
+  const iv = combined.slice(0, 12);
+
+  // The rest is the encrypted pkcs8 data
+  const encryptedData = combined.slice(12);
+
+  // Decrypt with AES-GCM
+  const decryptedBytes = await crypto.subtle.decrypt(
+    {
+      name: "AES-GCM",
+      iv: iv,
+    },
     wrappingKey,
-    "AES-KW",
-    { name: "RSA-OAEP", hash: "SHA-256" },
-    false,
-    ["decrypt"],
+    encryptedData,
   );
+
+  // Import the decrypted pkcs8 bytes as an RSA private key
+  const privateKey = await crypto.subtle.importKey(
+    "pkcs8",
+    decryptedBytes,
+    { name: "RSA-OAEP", hash: "SHA-256" },
+    false, // Not extractable again
+    ["decrypt"], // Only needed for decryption
+  );
+
+  return privateKey;
 }
 
 // ============================================================
