@@ -1,4 +1,4 @@
-# HNG Stage 4B — WhisperBox: End-to-End Encrypted Messenger
+# HNG Stage 4B | WhisperBox: End-to-End Encrypted Messenger
 
 ## Project Overview
 
