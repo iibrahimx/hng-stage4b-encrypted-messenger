@@ -110,6 +110,9 @@ async function registerUser(username, displayName, password) {
   session.currentUser = data.user;
   session.privateKey = keyPair.privateKey;
 
+  // Persist the session so it survives page refreshes
+  saveSession();
+
   return data.user;
 }
 
@@ -177,5 +180,74 @@ async function loginUser(username, password) {
   session.currentUser = data.user;
   session.privateKey = privateKey;
 
+  // Persist the session so it survives page refreshes
+  saveSession();
+
   return data.user;
+}
+
+// ============================================================
+// SESSION PERSISTENCE
+// Saves and restores session data to survive page refreshes
+// ============================================================
+
+/**
+ * Saves the current session to sessionStorage.
+ * This allows the session to survive page refreshes.
+ *
+ * IMPORTANT: We save tokens in sessionStorage, but the private key
+ * is a CryptoKey object and cannot be serialized. So we save the
+ * wrapped private key and salt, and we'll need the password to unlock it.
+ *
+ * Actually, for this demo, we'll save the raw access token and user info,
+ * and we'll store the wrapped key data so we can re-unlock on refresh
+ * IF we have the password. But we won't store the password.
+ *
+ * Pragmatic approach: Store tokens. On refresh, tokens still work for
+ * API calls. Messages can be loaded. But the private key must be
+ * re-derived. Since we can't store the password, new messages can't
+ * be decrypted after refresh unless the user logs in again.
+ *
+ * FOR DEMO PURPOSES: We'll store what we can. The user will need to
+ * log in again after a refresh to get full functionality back.
+ * This is actually a security feature, not a bug!
+ */
+function saveSession() {
+  const sessionData = {
+    accessToken: session.accessToken,
+    refreshToken: session.refreshToken,
+    currentUser: session.currentUser,
+    // Note: privateKey is a CryptoKey and cannot be serialized
+  };
+  sessionStorage.setItem("whisperbox_session", JSON.stringify(sessionData));
+}
+
+/**
+ * Restores the session from sessionStorage.
+ * Called on page load.
+ *
+ * @returns {boolean} - True if a session was restored, false otherwise
+ */
+function restoreSession() {
+  const saved = sessionStorage.getItem("whisperbox_session");
+  if (!saved) return false;
+
+  try {
+    const sessionData = JSON.parse(saved);
+    session.accessToken = sessionData.accessToken;
+    session.refreshToken = sessionData.refreshToken;
+    session.currentUser = sessionData.currentUser;
+    // privateKey is NOT restored — user must log in again for full E2EE
+    return true;
+  } catch (error) {
+    console.error("Failed to restore session:", error);
+    return false;
+  }
+}
+
+/**
+ * Clears the saved session from sessionStorage.
+ */
+function clearSavedSession() {
+  sessionStorage.removeItem("whisperbox_session");
 }

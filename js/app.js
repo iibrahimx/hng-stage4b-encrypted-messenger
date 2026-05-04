@@ -528,12 +528,13 @@ function displayConversations(conversations) {
     const item = document.createElement("div");
     item.className = "conversation-item";
     item.innerHTML = `
-            <div class="conversation-avatar">${conv.display_name.charAt(0).toUpperCase()}</div>
-            <div class="conversation-info">
-                <div class="conversation-name">${conv.display_name}</div>
-                <div class="conversation-username">@${conv.username}</div>
-            </div>
-        `;
+    <div class="conversation-avatar">${conv.display_name.charAt(0).toUpperCase()}</div>
+    <div class="conversation-info">
+        <div class="conversation-name">${conv.display_name}</div>
+        <div class="conversation-username">@${conv.username}</div>
+    </div>
+    <span class="unread-badge hidden" id="unread-${conv.user_id}">●</span>
+`;
 
     item.addEventListener("click", function () {
       openConversation(userCache[conv.user_id]);
@@ -549,6 +550,12 @@ function displayConversations(conversations) {
 
 async function openConversation(user) {
   activeConversation = user;
+
+  // Clear the unread badge for this user
+  const badge = document.getElementById("unread-" + user.id);
+  if (badge) {
+    badge.classList.add("hidden");
+  }
 
   chatHeaderName.textContent = user.display_name;
   encryptionBadge.style.display = "block";
@@ -697,6 +704,12 @@ function handleIncomingMessage(data) {
   if (activeConversation && data.from_user_id === activeConversation.id) {
     displayMessage(data);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  } else {
+    // Show an unread indicator on the conversation in the sidebar
+    const badge = document.getElementById("unread-" + data.from_user_id);
+    if (badge) {
+      badge.classList.remove("hidden");
+    }
   }
 
   loadConversations();
@@ -733,16 +746,21 @@ function escapeHTML(text) {
 // ============================================================
 
 logoutBtn.addEventListener("click", function () {
+  // Close the WebSocket connection
   if (wsConnection) {
     wsConnection.close();
     wsConnection = null;
   }
 
+  // Clear the session
   session.accessToken = null;
   session.refreshToken = null;
   session.currentUser = null;
   session.privateKey = null;
   activeConversation = null;
+
+  // Clear saved session from storage
+  clearSavedSession();
 
   messagesContainer.innerHTML = "";
   conversationsList.innerHTML = "";
@@ -755,3 +773,35 @@ logoutBtn.addEventListener("click", function () {
 
   showScreen("auth");
 });
+
+// ============================================================
+// AUTO-RESTORE SESSION ON PAGE LOAD
+// ============================================================
+
+// Check if there's a saved session from a previous login
+if (restoreSession()) {
+  console.log(
+    "Session restored, but private key not available. Please log in again.",
+  );
+}
+
+// ============================================================
+// CHECK FOR SAVED SESSION ON PAGE LOAD
+// ============================================================
+
+(function () {
+  const saved = sessionStorage.getItem("whisperbox_session");
+  if (saved) {
+    // There was a previous session, but the private key is gone
+    console.log(
+      "Previous session found but private key required — please log in again.",
+    );
+    // Optionally pre-fill the username
+    try {
+      const sessionData = JSON.parse(saved);
+      if (sessionData.currentUser) {
+        loginUsernameInput.value = sessionData.currentUser.username;
+      }
+    } catch (e) {}
+  }
+})();
