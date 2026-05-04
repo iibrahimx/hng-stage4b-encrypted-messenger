@@ -12,7 +12,7 @@ It uses RSA to securely share keys and AES to encrypt messages quickly. Private 
 
 ## Live Demo
 
-- Live URL
+- [Live URL](https://hng-stage4b-encrypted-messenger.vercel.app/)
 
 ---
 
@@ -289,20 +289,6 @@ Endpoints:
 | GET    | /conversations               | List conversations |
 | GET    | /conversations/{id}/messages | Messages           |
 | WS     | /ws?token=                   | WebSocket          |
-
----
-
-## Evaluation Criteria Alignment
-
-| Requirement            | Status |
-| ---------------------- | ------ |
-| Encryption implemented | ✅     |
-| No plaintext on server | ✅     |
-| Proper key management  | ✅     |
-| Secure architecture    | ✅     |
-| Web Crypto usage       | ✅     |
-| Clean UI               | ✅     |
-| Error handling         | ✅     |
 
 ---
 
