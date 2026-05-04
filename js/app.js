@@ -33,20 +33,41 @@ const registerDisplayNameInput = document.getElementById(
 );
 const registerPasswordInput = document.getElementById("register-password");
 
+// --- Error Message Elements ---
+// Login errors
+const loginUsernameError = document.getElementById("login-username-error");
+const loginPasswordError = document.getElementById("login-password-error");
+
+// Register errors
+const registerUsernameError = document.getElementById(
+  "register-username-error",
+);
+const registerDisplayNameError = document.getElementById(
+  "register-display-name-error",
+);
+const registerPasswordError = document.getElementById(
+  "register-password-error",
+);
+
 // ============================================================
 // Toggle between Login and Register forms
 // ============================================================
-
 showRegisterLink.addEventListener("click", function (event) {
   event.preventDefault(); // Stop the link from trying to navigate to "#"
+  clearAllErrors(loginFields); // Clear any login errors
+  clearAllErrors(registerFields); // Clear any register errors
   loginForm.classList.add("hidden");
   registerForm.classList.remove("hidden");
+  loginForm.reset(); // reset the form fields
 });
 
 showLoginLink.addEventListener("click", function (event) {
-  event.preventDefault(); // Stop the link from trying to navigate to "#"
+  event.preventDefault();
+  clearAllErrors(loginFields);
+  clearAllErrors(registerFields);
   registerForm.classList.add("hidden");
   loginForm.classList.remove("hidden");
+  registerForm.reset();
 });
 
 // ============================================================
@@ -87,21 +108,100 @@ function updateSidebarUser(user) {
 }
 
 // ============================================================
+// VALIDATION HELPERS
+// ============================================================
+
+/**
+ * Shows an error message below a specific input field.
+ *
+ * @param {HTMLElement} inputElement - The input that has the error
+ * @param {HTMLElement} errorElement - The span where the message appears
+ * @param {string} message - The error message to display
+ */
+function showInputError(inputElement, errorElement, message) {
+  inputElement.classList.add("error");
+  errorElement.textContent = message;
+}
+
+/**
+ * Clears an error message from a specific input field.
+ *
+ * @param {HTMLElement} inputElement - The input to clear the error from
+ * @param {HTMLElement} errorElement - The error span to clear
+ */
+function clearInputError(inputElement, errorElement) {
+  inputElement.classList.remove("error");
+  errorElement.textContent = "";
+}
+
+/**
+ * Clears ALL error messages in a form.
+ * Call this when switching forms or before re-validating.
+ *
+ * @param {Array} fields - Array of {input, error} objects
+ */
+function clearAllErrors(fields) {
+  fields.forEach(function (field) {
+    clearInputError(field.input, field.error);
+  });
+}
+
+// ============================================================
 // Handle login form submission
 // ============================================================
 
+// Define the login fields for easy clearing
+const loginFields = [
+  { input: loginUsernameInput, error: loginUsernameError },
+  { input: loginPasswordInput, error: loginPasswordError },
+];
+
+// Clear errors when the user starts typing
+loginUsernameInput.addEventListener("input", function () {
+  clearInputError(loginUsernameInput, loginUsernameError);
+});
+
+loginPasswordInput.addEventListener("input", function () {
+  clearInputError(loginPasswordInput, loginPasswordError);
+});
+
 loginForm.addEventListener("submit", async function (event) {
   event.preventDefault();
+
+  // Clear all previous errors first
+  clearAllErrors(loginFields);
 
   // Get the values the user typed
   const username = loginUsernameInput.value.trim();
   const password = loginPasswordInput.value;
 
-  if (!username || !password) {
-    alert("Please enter both username and password.");
+  // --- Validation checks ---
+  let hasError = false;
+
+  if (!username) {
+    showInputError(
+      loginUsernameInput,
+      loginUsernameError,
+      "Username is required.",
+    );
+    hasError = true;
+  }
+
+  if (!password) {
+    showInputError(
+      loginPasswordInput,
+      loginPasswordError,
+      "Password is required.",
+    );
+    hasError = true;
+  }
+
+  // If any validation failed, stop here
+  if (hasError) {
     return;
   }
 
+  // --- Proceed with login ---
   const submitButton = loginForm.querySelector('button[type="submit"]');
   const originalButtonText = submitButton.textContent;
   submitButton.textContent = "Logging in...";
@@ -112,18 +212,30 @@ loginForm.addEventListener("submit", async function (event) {
     // This sends the credentials to the server, gets back the keys,
     // unwraps the private key, and saves everything to the session
     const user = await loginUser(username, password);
-
     updateSidebarUser(user); // Put the user's info in the sidebar on success
 
     // Switch to the chat screen
     showScreen("chat");
 
     // Clear the form fields
+
     loginForm.reset();
   } catch (error) {
-    alert("Login failed: " + error.message);
-
+    // Show server errors as inline errors when possible
+    const errorMessage = error.message.toLowerCase();
+    if (errorMessage.includes("username") || errorMessage.includes("user")) {
+      showInputError(loginUsernameInput, loginUsernameError, error.message);
+    } else if (
+      errorMessage.includes("password") ||
+      errorMessage.includes("credential")
+    ) {
+      showInputError(loginPasswordInput, loginPasswordError, error.message);
+    } else {
+      // Generic error — show it on the password field
+      showInputError(loginPasswordInput, loginPasswordError, error.message);
+    }
     // Reset the button back to normal
+
     submitButton.textContent = originalButtonText;
     submitButton.disabled = false;
   }
@@ -133,23 +245,98 @@ loginForm.addEventListener("submit", async function (event) {
 // Handle registration form submission
 // ============================================================
 
+// ============================================================
+// REGISTER FORM HANDLER (with proper validation)
+// ============================================================
+
+// Define the register fields for easy clearing
+const registerFields = [
+  { input: registerUsernameInput, error: registerUsernameError },
+  { input: registerDisplayNameInput, error: registerDisplayNameError },
+  { input: registerPasswordInput, error: registerPasswordError },
+];
+
+// Clear errors when the user starts typing
+registerUsernameInput.addEventListener("input", function () {
+  clearInputError(registerUsernameInput, registerUsernameError);
+});
+
+registerDisplayNameInput.addEventListener("input", function () {
+  clearInputError(registerDisplayNameInput, registerDisplayNameError);
+});
+
+registerPasswordInput.addEventListener("input", function () {
+  clearInputError(registerPasswordInput, registerPasswordError);
+});
+
 registerForm.addEventListener("submit", async function (event) {
   event.preventDefault();
 
+  // Clear all previous errors
+  clearAllErrors(registerFields);
+
+  // Get the values
   const username = registerUsernameInput.value.trim();
   const displayName = registerDisplayNameInput.value.trim();
   const password = registerPasswordInput.value;
 
-  if (!username || !displayName || !password) {
-    alert("Please fill in all fields.");
+  // --- Validation checks ---
+  let hasError = false;
+
+  if (!username) {
+    showInputError(
+      registerUsernameInput,
+      registerUsernameError,
+      "Username is required.",
+    );
+    hasError = true;
+  } else if (username.length < 3) {
+    showInputError(
+      registerUsernameInput,
+      registerUsernameError,
+      "Username must be at least 3 characters.",
+    );
+    hasError = true;
+  }
+
+  if (!displayName) {
+    showInputError(
+      registerDisplayNameInput,
+      registerDisplayNameError,
+      "Display name is required.",
+    );
+    hasError = true;
+  }
+
+  if (!password) {
+    showInputError(
+      registerPasswordInput,
+      registerPasswordError,
+      "Password is required.",
+    );
+    hasError = true;
+  } else if (password.length < 8) {
+    showInputError(
+      registerPasswordInput,
+      registerPasswordError,
+      "Password must be 8 characters or more.",
+    );
+    hasError = true;
+  } else if (password.length > 128) {
+    showInputError(
+      registerPasswordInput,
+      registerPasswordError,
+      "Password must be 128 characters or fewer.",
+    );
+    hasError = true;
+  }
+
+  // If any validation failed, stop here
+  if (hasError) {
     return;
   }
 
-  if (password.length < 8) {
-    alert("Password must be at least 8 characters long.");
-    return;
-  }
-
+  // --- Proceed with registration ---
   const submitButton = registerForm.querySelector('button[type="submit"]');
   const originalButtonText = submitButton.textContent;
   submitButton.textContent = "Creating Account...";
@@ -159,12 +346,38 @@ registerForm.addEventListener("submit", async function (event) {
     // Call registerUser from auth.js
     // This generates keys, wraps the private key, and sends everything
     const user = await registerUser(username, displayName, password);
-
     updateSidebarUser(user);
     showScreen("chat");
     registerForm.reset();
   } catch (error) {
-    alert("Registration failed: " + error.message);
+    // Show server errors as inline errors
+    const errorMessage = error.message.toLowerCase();
+    if (errorMessage.includes("username") || errorMessage.includes("taken")) {
+      showInputError(
+        registerUsernameInput,
+        registerUsernameError,
+        error.message,
+      );
+    } else if (errorMessage.includes("display")) {
+      showInputError(
+        registerDisplayNameInput,
+        registerDisplayNameError,
+        error.message,
+      );
+    } else if (errorMessage.includes("password")) {
+      showInputError(
+        registerPasswordInput,
+        registerPasswordError,
+        error.message,
+      );
+    } else {
+      // Generic error
+      showInputError(
+        registerPasswordInput,
+        registerPasswordError,
+        error.message,
+      );
+    }
     submitButton.textContent = originalButtonText;
     submitButton.disabled = false;
   }

@@ -31,8 +31,8 @@
               id="login-username"
               placeholder="Enter your username"
               autocomplete="username"
-              required
             />
+            <span class="error-message" id="login-username-error"></span>
           </div>
 
           <div class="input-group">
@@ -42,8 +42,8 @@
               id="login-password"
               placeholder="Enter your password"
               autocomplete="current-password"
-              required
             />
+            <span class="error-message" id="login-password-error"></span>
           </div>
 
           <button type="submit" class="btn btn-primary">Log In</button>
@@ -65,8 +65,8 @@
               id="register-username"
               placeholder="Choose a username"
               autocomplete="username"
-              required
             />
+            <span class="error-message" id="register-username-error"></span>
           </div>
 
           <div class="input-group">
@@ -76,8 +76,8 @@
               id="register-display-name"
               placeholder="Your full name"
               autocomplete="name"
-              required
             />
+            <span class="error-message" id="register-display-name-error"></span>
           </div>
 
           <div class="input-group">
@@ -87,9 +87,8 @@
               id="register-password"
               placeholder="Create a strong password"
               autocomplete="new-password"
-              required
-              minlength="8"
             />
+            <span class="error-message" id="register-password-error"></span>
           </div>
 
           <button type="submit" class="btn btn-primary">Create Account</button>
