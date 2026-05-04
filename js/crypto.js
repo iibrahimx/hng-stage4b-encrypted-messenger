@@ -53,12 +53,20 @@ function arrayBufferToBase64(buffer) {
 
 /**
  * Function 1: deriveWrappingKey
- * Turns a user's password into a special "safe key" (AES-KW wrapping key).
+ *
+ * Turns a user's password into an encryption key using PBKDF2.
+ * This key is used to encrypt (and later decrypt) the RSA private key.
+ *
+ * @param {string} password - The user's secret password
+ * @param {Uint8Array} salt - Random salt bytes (makes every derived key unique)
+ * @returns {Promise<CryptoKey>} - The derived encryption key
  */
 async function deriveWrappingKey(password, salt) {
+  // Turn the password string into raw bytes
   const encoder = new TextEncoder();
   const passwordBytes = encoder.encode(password);
 
+  // Import the password bytes as a "base key" material
   const baseKey = await crypto.subtle.importKey(
     "raw",
     passwordBytes,
@@ -67,6 +75,9 @@ async function deriveWrappingKey(password, salt) {
     ["deriveKey"],
   );
 
+  // Use PBKDF2 to derive an AES-GCM key
+  // This is the same secure key derivation, but now produces
+  // an AES-GCM key that can encrypt and decrypt directly
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
@@ -75,9 +86,9 @@ async function deriveWrappingKey(password, salt) {
       hash: "SHA-256",
     },
     baseKey,
-    { name: "AES-KW", length: 256 },
+    { name: "AES-GCM", length: 256 },
     false,
-    ["wrapKey", "unwrapKey"],
+    ["encrypt", "decrypt"],
   );
 }
 
